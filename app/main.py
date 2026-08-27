@@ -1,11 +1,25 @@
 from fastapi import FastAPI
 
-from app.database import engine
-from app.models import Base
-from app.routers import auth_router
+from app.database import Base, engine
+from app.routers import auth_router, project_router
 
+# Create all database tables
 Base.metadata.create_all(bind=engine)
 
-app = FastAPI()
+# Initialize FastAPI application
+app = FastAPI(
+    title="Employee Task Management System",
+    description="Employee Task Management API with JWT Authentication",
+    version="1.0.0"
+)
 
+# Register Routers
 app.include_router(auth_router.router)
+app.include_router(project_router.router)
+
+
+@app.get("/")
+def home():
+    return {
+        "message": "Employee Task Management API is running"
+    }
