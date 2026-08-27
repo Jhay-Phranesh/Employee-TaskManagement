@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-
+from app.logger import logger
 from app.database import get_db
 from app.models import Task
 from app.schemas import TaskCreate, TaskAssign, TaskUpdate
@@ -26,6 +26,10 @@ def create_task(
     db.add(new_task)
     db.commit()
     db.refresh(new_task)
+
+    logger.info(
+    f"Task created: {new_task.title}"
+    )
 
     return {
         "message": "Task created successfully",

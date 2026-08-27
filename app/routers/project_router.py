@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
-
+from app.logger import logger
 from app.database import get_db
 from app.models import Project
 from app.schemas import ProjectCreate
@@ -23,6 +23,10 @@ def create_project(
     db.add(new_project)
     db.commit()
     db.refresh(new_project)
+
+    logger.info(
+    f"Project created: {new_project.project_name}"
+    )
 
     return {
         "message": "Project created successfully",

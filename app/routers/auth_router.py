@@ -1,16 +1,19 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
+from app.auth import (
+    create_access_token,
+    hash_password,
+    verify_password
+)
 from app.database import get_db
+from app.logger import logger
 from app.models import User
 from app.schemas import UserCreate, UserLogin
-from app.auth import (
-    hash_password,
-    verify_password,
-    create_access_token
-)
 
-router = APIRouter(tags=["Authentication"])
+router = APIRouter(
+    tags=["Authentication"]
+)
 
 
 @router.post("/register")
@@ -18,7 +21,6 @@ def register(
     user: UserCreate,
     db: Session = Depends(get_db)
 ):
-
     existing_user = db.query(User).filter(
         User.username == user.username
     ).first()
@@ -40,6 +42,10 @@ def register(
     db.commit()
     db.refresh(new_user)
 
+    logger.info(
+        f"User registered: {new_user.username}"
+    )
+
     return {
         "message": "User registered successfully"
     }
@@ -50,7 +56,6 @@ def login(
     user: UserLogin,
     db: Session = Depends(get_db)
 ):
-
     db_user = db.query(User).filter(
         User.username == user.username
     ).first()
@@ -75,6 +80,10 @@ def login(
             "sub": db_user.username,
             "role": db_user.role
         }
+    )
+
+    logger.info(
+        f"User logged in: {db_user.username}"
     )
 
     return {

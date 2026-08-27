@@ -1,6 +1,6 @@
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
-
+from app.logger import logger
 from app.models import Task, User
 
 
@@ -17,6 +17,10 @@ def assign_task_to_employee(
         User.id == employee_id
     ).first()
 
+    logger.warning(
+    f"Project mismatch. Task Project={task.project_id}, Employee Project={employee.project_id}"
+    )
+    
     if not task:
         raise HTTPException(
             status_code=404,
