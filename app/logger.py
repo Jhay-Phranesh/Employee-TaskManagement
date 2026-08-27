@@ -1,5 +1,9 @@
+import os
 import logging
 from logging.handlers import RotatingFileHandler
+
+# Create logs directory if it doesn't exist
+os.makedirs("app/logs", exist_ok=True)
 
 logger = logging.getLogger("employee_task_manager")
 
