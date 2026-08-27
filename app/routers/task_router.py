@@ -2,8 +2,9 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from app.database import get_db
-from app.models import Task, User
+from app.models import Task
 from app.schemas import TaskCreate, TaskAssign, TaskUpdate
+from app.services.task_service import assign_task_to_employee
 
 router = APIRouter(
     prefix="/tasks",
@@ -44,34 +45,11 @@ def assign_task(
     task_data: TaskAssign,
     db: Session = Depends(get_db)
 ):
-    task = db.query(Task).filter(
-        Task.id == task_data.task_id
-    ).first()
-
-    employee = db.query(User).filter(
-        User.id == task_data.employee_id
-    ).first()
-
-    if not task:
-        raise HTTPException(
-            status_code=404,
-            detail="Task not found"
-        )
-
-    if not employee:
-        raise HTTPException(
-            status_code=404,
-            detail="Employee not found"
-        )
-
-    task.assigned_to = employee.id
-
-    db.commit()
-
-    return {
-        "message": "Task assigned successfully"
-    }
-
+    return assign_task_to_employee(
+        task_data.task_id,
+        task_data.employee_id,
+        db
+    )
 
 @router.put("/{task_id}/status")
 def update_task_status(
