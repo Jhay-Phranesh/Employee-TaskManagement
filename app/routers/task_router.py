@@ -5,7 +5,7 @@ from app.database import get_db
 from app.models import Task
 from app.schemas import TaskCreate, TaskAssign, TaskUpdate
 from app.services.task_service import assign_task_to_employee
-
+from app.auth import get_current_user
 router = APIRouter(
     prefix="/tasks",
     tags=["Tasks"]
@@ -15,7 +15,8 @@ router = APIRouter(
 @router.post("/")
 def create_task(
     task: TaskCreate,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user)
 ):
     new_task = Task(
         title=task.title,

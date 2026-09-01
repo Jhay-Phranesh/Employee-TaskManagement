@@ -4,6 +4,7 @@ from app.logger import logger
 from app.database import get_db
 from app.models import Project
 from app.schemas import ProjectCreate
+from app.auth import get_current_user
 
 router = APIRouter(
     prefix="/projects",
@@ -14,7 +15,8 @@ router = APIRouter(
 @router.post("/")
 def create_project(
     project: ProjectCreate,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user)
 ):
     new_project = Project(
         project_name=project.project_name

@@ -4,7 +4,7 @@ from app.auth import hash_password
 from app.database import get_db
 from app.models import User
 from app.schemas import UserCreate
-
+from app.auth import get_current_user
 router = APIRouter(
     prefix="/employees",
     tags=["Employees"]
@@ -14,7 +14,8 @@ router = APIRouter(
 @router.post("/")
 def create_employee(
     employee: UserCreate,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user)
 ):
     new_employee = User(
     username=employee.username,
